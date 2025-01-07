@@ -16,7 +16,7 @@ Before you begin, make sure you have the following installed:
 Clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/yourusername/demo-react-node-app.git
+git clone https://github.com/rawaabha/demo-react-node-app.git
 cd demo-react-node-app
 ```
 ### 2. Add env variables
