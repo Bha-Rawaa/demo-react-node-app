@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: rawaabha/frontend:latest
+    ports:
+      - "3000:80"  # Map frontend container port 80 to host port 3000
+    depends_on:
+      - backend
+
+  backend:
+    image: rawaabha/backend:latest
+    ports:
+      - "5000:5000"  # Map backend container port 5000 to host port 5000
+    environment:
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - PG_HOST=postgres
+      - PG_DB=${PG_DB}
+      - PG_PORT=5432
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    ports:
+      - "5432:5432"  # Map container port 5432 to host port 5432
+
+volumes:
+  postgres_data:
+    driver: local
