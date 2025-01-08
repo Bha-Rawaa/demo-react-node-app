@@ -62,7 +62,7 @@ jobs:
     needs: [build-frontend, build-backend]
     steps:
       - name: Trigger workflow in Helm repository to update values.yaml
-        uses: peter-evans/workflow-dispatch@v1
+        uses: peter-evans/workflow-dispatch@v3
         with:
           repository: Fenleap/Fenwave-test  
           workflow: update-helm-values.yml
