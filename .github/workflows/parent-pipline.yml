@@ -8,6 +8,8 @@ on:
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
+    outputs:
+      frontend_commit_id: ${{ steps.build-frontend.outputs.GIT_COMMIT_ID }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -19,6 +21,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push frontend image
+        id: build-frontend
         run: |
           cd frontend
           npm install
@@ -26,9 +29,13 @@ jobs:
           GIT_COMMIT_ID=$(git rev-parse --short HEAD)
           docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:${GIT_COMMIT_ID}  .
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:${GIT_COMMIT_ID}
+          echo "GIT_COMMIT_ID=${GIT_COMMIT_ID}" >> $GITHUB_ENV
+          echo "::set-output name=GIT_COMMIT_ID::${GIT_COMMIT_ID}"
 
   build-backend:
     runs-on: ubuntu-latest
+    outputs:
+      backend_commit_id: ${{ steps.build-backend.outputs.GIT_COMMIT_ID }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -40,12 +47,15 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push backend image
+        id: build-backend
         run: |
           cd backend
           npm install
           GIT_COMMIT_ID=$(git rev-parse --short HEAD)
           docker build -t ${{ secrets.DOCKER_USERNAME }}/backend:${GIT_COMMIT_ID}  .
           docker push ${{ secrets.DOCKER_USERNAME }}/backend:${GIT_COMMIT_ID}
+          echo "GIT_COMMIT_ID=${GIT_COMMIT_ID}" >> $GITHUB_ENV
+          echo "::set-output name=GIT_COMMIT_ID::${GIT_COMMIT_ID}"
 
   trigger-update-values-pipeline:
     runs-on: ubuntu-latest
@@ -54,9 +64,9 @@ jobs:
       - name: Trigger workflow in Helm repository to update values.yaml
         uses: peter-evans/workflow-dispatch@v1
         with:
-          repository: fenleap/Fenwave-test.git
+          repository: Fenleap/Fenwave-test  
           workflow: update-helm-values.yml
-          ref: main 
-          inputs:  
-            frontend_tag: ${{ secrets.DOCKER_USERNAME }}/frontend:latest
-            backend_tag: ${{ secrets.DOCKER_USERNAME }}/backend:${GIT_COMMIT_ID}
+          ref: main  
+          inputs:
+            frontend_tag: ${{ secrets.DOCKER_USERNAME }}/frontend:${{ needs.build-frontend.outputs.frontend_commit_id }}
+            backend_tag: ${{ secrets.DOCKER_USERNAME }}/backend:${{ needs.build-backend.outputs.backend_commit_id }}
