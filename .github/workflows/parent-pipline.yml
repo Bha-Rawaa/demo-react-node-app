@@ -24,11 +24,10 @@ jobs:
           npm install
           npm run build
           docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest -f frontend/Dockerfile .
-          docker push ${{ secrets.DOCKER_USERNAME }}/rontend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
   build-backend:
     runs-on: ubuntu-latest
-    needs: build-frontend 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
