@@ -7,7 +7,7 @@ const getTodos = async () => {
 
 const createTodo = async (title) => { // Use 'title' here
     const { rows } = await db.query(
-        "INSERT INTO todos (title) VALUES ($1) RETURNING *", // Insert 'title' into 'title' column
+        "INSERT INTO todos (title) VALUES ($1) RETURNING *", // Insert 'title' 
         [title]
     );
     return rows[0];
