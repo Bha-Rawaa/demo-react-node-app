@@ -1,0 +1,40 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push frontend image
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          cd ..
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-project-frontend:latest -f frontend/Dockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-project-frontend:latest
+
+
+      - name: Build and push backend image
+        run: |
+          cd backend
+          npm install
+          npm run build  # Ensure this script builds your backend (if required)
+          cd ..
+          GIT_COMMIT_ID=$(git rev-parse --short HEAD)
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-project-backend:${GIT_COMMIT_ID} -f backend/Dockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-project-backend:${GIT_COMMIT_ID}
