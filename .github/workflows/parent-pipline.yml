@@ -67,6 +67,6 @@ jobs:
           repository: Fenleap/Fenwave-test  
           workflow: update-helm-values.yml
           ref: main  
-          inputs:
-            frontend_tag: ${{ secrets.DOCKER_USERNAME }}/frontend:${{ needs.build-frontend.outputs.frontend_commit_id }}
-            backend_tag: ${{ secrets.DOCKER_USERNAME }}/backend:${{ needs.build-backend.outputs.backend_commit_id }}
+          # inputs:
+          #   frontend_tag: ${{ secrets.DOCKER_USERNAME }}/frontend:${{ needs.build-frontend.outputs.frontend_commit_id }}
+          #   backend_tag: ${{ secrets.DOCKER_USERNAME }}/backend:${{ needs.build-backend.outputs.backend_commit_id }}
